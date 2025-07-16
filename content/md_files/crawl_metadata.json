@@ -1,0 +1,29 @@
+{
+  "crawl_parameters": {
+    "requested_url_original": "https://bontemps.paris/jardin-secret/",
+    "requested_url_schemed": "https://bontemps.paris/jardin-secret/",
+    "base_output_directory_target_for_zip": "C:\\Users\\victo\\crawl_output_single",
+    "max_concurrency": 8,
+    "max_depth": 2
+  },
+  "crawl_summary_snapshot": {
+    "initial_url_input": "https://bontemps.paris/jardin-secret/",
+    "initial_url_schemed": "https://bontemps.paris/jardin-secret/",
+    "effective_start_url": "https://bontemps.paris/jardin-secret/",
+    "original_data_path_before_zip": "C:\\Users\\victo\\crawl_output_single\\bontemps_paris",
+    "metadata_file_location_note": "Metadata processing not initiated or site folder invalid.",
+    "total_pages_crawled_successfully": 12,
+    "total_pages_failed": 0,
+    "failed_pages_details": [],
+    "total_pages_skipped_by_filter": 17,
+    "sitemap_processing_results": {
+      "status": "success",
+      "sitemap_csv_path": "C:\\Users\\victo\\crawl_output_single\\bontemps_paris\\sitemap_data.csv",
+      "sitemap_urls_found_with_valid_lastmod": 80,
+      "total_sitemap_entries_returned_by_crawler_module": 80,
+      "error": null,
+      "based_on_effective_url": "https://bontemps.paris/jardin-secret/"
+    },
+    "metadata_file_info_in_archive": "This metadata is stored as 'bontemps_paris\\crawl_metadata.json' (relative to the root of the unzipped archive)."
+  }
+}

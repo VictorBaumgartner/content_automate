@@ -53,24 +53,46 @@ def select_image():
     store.set("selected_image", image)
     return image
 
-# Node 3: Generate Social Media Post
+# Node 3: Analyze Image Content
+def analyze_image():
+    image_path = store.get("selected_image")
+    if not image_path:
+        return None
+    
+    # Use Ollama with a vision-capable model (e.g., llava:13b)
+    with open(image_path, 'rb') as image_file:
+        response = ollama.generate(
+            model="llava:13b",  # Use vision-capable model
+            prompt="Describe the content of this image in a few sentences, focusing on elements relevant to a restaurant (e.g., food, decor, ambiance).",
+            images=[image_file.read()],
+            options={"temperature": 0.5, "max_tokens": 100}
+        )
+    image_description = response['response'].strip()
+    store.set("image_description", image_description)
+    return image_description
+
+# Node 4: Generate Social Media Post
 def generate_post():
     content = store.get("md_content")
     filename = store.get("md_filename")
-    if not content:
+    image_description = store.get("image_description")
+    if not content or not image_description:
         return None
     
-    # Prompt for Llama3.1 to generate a post with hashtags
+    # Prompt for Llama3.1 to generate a post with image context and hashtags
     prompt = f"""
-    You are a social media manager for a high-end restaurant. Based on the following content from a file named '{filename}', create a vibrant, engaging social media post (max 280 characters) that promotes the restaurant's food, quality, prestige, vibe, and warm atmosphere. Use emojis and a positive tone. Include 3-5 relevant hashtags to target food enthusiasts.
+    You are a creative social media manager for a high-end restaurant. Based on the following content from a file named '{filename}' and the image description, craft a vibrant, engaging social media post (max 280 characters) that promotes the restaurant's food, quality, prestige, vibe, and warm atmosphere. Ensure the post aligns with the image content (e.g., if the image shows a dessert, focus on that dessert). Use emojis, a positive tone, and add 3-5 relevant hashtags to target food enthusiasts.
 
-    Content:
+    File Content:
     {content}
+
+    Image Description:
+    {image_description}
 
     Post:
     """
     
-    # Use Ollama's Llama3.1 for generation
+    # Use Llama3.1 for text generation
     response = ollama.generate(
         model="llama3.1:latest",
         prompt=prompt,
@@ -79,11 +101,11 @@ def generate_post():
     post_text = response['response'].strip()
     # Ensure hashtags are added if not in response
     if "#" not in post_text:
-        post_text += " #Foodie #RestaurantVibes #Gourmet #DiningExperience"
+        post_text += " #Foodie #RestaurantVibes #Gourmet #DiningExperience #Delicious"
     store.set("post_text", post_text)
     return post_text
 
-# Node 4: Post to Facebook
+# Node 5: Post to Facebook
 def post_to_facebook():
     post_text = store.get("post_text")
     image_path = store.get("selected_image")
@@ -105,7 +127,7 @@ def post_to_facebook():
         shutil.move(image_path, os.path.join(HISTORY_FOLDER, os.path.basename(image_path)))
     return response.json()
 
-# Node 5: Post to Instagram
+# Node 6: Post to Instagram
 def post_to_instagram():
     post_text = store.get("post_text")
     image_path = store.get("selected_image")
@@ -144,13 +166,15 @@ graph = pf.Graph()
 # Add Nodes
 graph.add_node("read_md", read_md_files)
 graph.add_node("select_image", select_image)
+graph.add_node("analyze_image", analyze_image)
 graph.add_node("generate_post", generate_post)
 graph.add_node("post_facebook", post_to_facebook)
 graph.add_node("post_instagram", post_to_instagram)
 
 # Define Actions (Edges)
 graph.add_action("read_md", "select_image")
-graph.add_action("select_image", "generate_post")
+graph.add_action("select_image", "analyze_image")
+graph.add_action("analyze_image", "generate_post")
 graph.add_action("generate_post", "post_facebook")
 graph.add_action("generate_post", "post_instagram")
 
